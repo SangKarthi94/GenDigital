@@ -1,6 +1,12 @@
 package com.sangavi.gendigital.presentation
 
 import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,6 +34,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import com.sangavi.gendigital.ui.post.model.PostListData
 import com.sangavi.gendigital.ui.post.viewmodel.FilterOption
@@ -40,6 +50,7 @@ import kotlinx.coroutines.launch
 fun PostListUIScreen(
     userListUIData: UserListUIData,
     onProfileClick: () -> Unit,
+    onDismissErrorDialog: () -> Unit,
     viewModel: PostViewModel
 ) {
 //    val context = LocalContext.current
@@ -131,14 +142,31 @@ fun PostListUIScreen(
                 when {
                     postListState.isLoading -> {
                         // Display loading indicator
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        Log.e("User State", "Loading")
+                        val infiniteTransition = rememberInfiniteTransition(label = "")
+                        val progressAnimate by infiniteTransition.animateFloat(
+                            initialValue = 0f,
+                            targetValue = 1f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(durationMillis = 1000, easing = LinearEasing)
+                            ), label = ""
+                        )
+                        CircularProgressIndicator(
+                            progress = progressAnimate,
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            strokeCap = StrokeCap.Round,
+                            color = Color.Gray
+                        )
                     }
                     postListState.error.isNotEmpty() -> {
-                        // Display error message
-                        Text(
-                            text = postListState.error,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        // Display error message in alert dialog
+                        showErrorDialog(
+                            errorMessage = postListState.error,
+                            onDismiss = { onDismissErrorDialog() },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(Color.White)
+                                .padding(16.dp)
                         )
                     }
                     else -> {

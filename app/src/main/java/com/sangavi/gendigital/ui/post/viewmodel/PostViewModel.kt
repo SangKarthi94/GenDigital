@@ -1,6 +1,5 @@
 package com.sangavi.gendigital.ui.post.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sangavi.gendigital.domain.core.Result
@@ -12,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 
@@ -34,28 +35,48 @@ class PostViewModel @Inject constructor(
 
     private fun getAllPostList() {
         viewModelScope.launch {
+            _postListStateFlow.update { it.copy(isLoading = true) }
 
-            when (val result = getListUseCase(Unit)) {
-                is Result.Error -> {
-                    _postListStateFlow.update {
-                        it.copy(error = it.error)
-                    }
+            val result = withTimeoutOrNull(30_000) {
+                try {
+                    getListUseCase(Unit)
+                } catch (e: UnknownHostException) {
+                    Result.Error(e)
+                } catch (e: Exception) {
+                    Result.Error(e)
                 }
+            }
 
-                is Result.Loading -> {
-                    _postListStateFlow.update {
-                        it.copy(isLoading = true)
-                    }
+            if (result == null) {
+                /*Handle timeout error (If it occurs please Invalidate and restart android studio,
+                Its happening time to time due to URL issue)*/
+                _postListStateFlow.update {
+                    it.copy(isLoading = false, error = "Request timed out. Please try again.")
                 }
+            } else {
+                when (result) {
+                    is Result.Error -> {
+                        _postListStateFlow.update {
+                            val errorMessage = if (result.exception is UnknownHostException) {
+                                "Network error: Unable to resolve host. Please check your internet connection."
+                            } else {
+                                result.exception.message ?: "Unknown error"
+                            }
+                            it.copy(error = errorMessage, isLoading = false)
+                        }
+                    }
 
-                is Result.Success -> {
+                    is Result.Loading -> {
+                        _postListStateFlow.update { it.copy(isLoading = true) }
+                    }
 
-                    Log.e("All post", "${result.data.size}")
-                    _postListStateFlow.update {
-                        it.copy(
-                            postListData = result.data,
-                            isLoading = false
-                        )
+                    is Result.Success -> {
+                        _postListStateFlow.update {
+                            it.copy(
+                                postListData = result.data,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }
@@ -64,28 +85,47 @@ class PostViewModel @Inject constructor(
 
     fun getUserPostList(userId: Int) {
         viewModelScope.launch {
+            _postListStateFlow.update { it.copy(isLoading = true) }
 
-            when (val result = getPostListUseCase(userId)) {
-                is Result.Error -> {
-                    _postListStateFlow.update {
-                        it.copy(error = it.error)
-                    }
+            val result = withTimeoutOrNull(30_000) {
+                try {
+                    getPostListUseCase(userId)
+                } catch (e: UnknownHostException) {
+                    Result.Error(e)
+                } catch (e: Exception) {
+                    Result.Error(e)
                 }
+            }
 
-                is Result.Loading -> {
-                    _postListStateFlow.update {
-                        it.copy(isLoading = true)
-                    }
+            if (result == null) {
+                // Handle timeout error
+                _postListStateFlow.update {
+                    it.copy(isLoading = false, error = "Request timed out. Please try again.")
                 }
+            } else {
+                when (result) {
+                    is Result.Error -> {
+                        _postListStateFlow.update {
+                            val errorMessage = if (result.exception is UnknownHostException) {
+                                "Network error: Unable to resolve host. Please check your internet connection."
+                            } else {
+                                result.exception.message ?: "Unknown error"
+                            }
+                            it.copy(error = errorMessage, isLoading = false)
+                        }
+                    }
 
-                is Result.Success -> {
+                    is Result.Loading -> {
+                        _postListStateFlow.update { it.copy(isLoading = true) }
+                    }
 
-                    Log.e("User post", "${result.data.size}")
-                    _postListStateFlow.update {
-                        it.copy(
-                            userPostListData = result.data,
-                            isLoading = false
-                        )
+                    is Result.Success -> {
+                        _postListStateFlow.update {
+                            it.copy(
+                                userPostListData = result.data,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }

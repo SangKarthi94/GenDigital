@@ -18,6 +18,8 @@
         <activity
             android:name=".ui.post.PostActivity"
             android:theme="@style/Theme.GenDigitalTheme"
+            android:screenOrientation="portrait"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

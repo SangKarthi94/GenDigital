@@ -28,7 +28,12 @@ class PostActivity : AppCompatActivity() {
 
                 if (userDetail != null) {
                     viewModel.getUserPostList(userDetail.id)
-                    PostListUIScreen(userDetail, onProfileClick = { navigateToProfile() }, viewModel)
+                    PostListUIScreen(
+                        userDetail,
+                        onProfileClick = { navigateToProfile() },
+                        onDismissErrorDialog = viewModel::dismissErrorDialog,
+                        viewModel
+                    )
                 }
             }
         }
