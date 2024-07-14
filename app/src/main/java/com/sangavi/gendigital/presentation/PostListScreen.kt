@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -127,8 +128,24 @@ fun PostListUIScreen(
                         }.padding(end = 25.dp)
                     )
                 }
-                // RecyclerView for displaying post list data
-                PostListRecyclerView(postList.value)
+                when {
+                    postListState.isLoading -> {
+                        // Display loading indicator
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    postListState.error.isNotEmpty() -> {
+                        // Display error message
+                        Text(
+                            text = postListState.error,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                    else -> {
+                        // RecyclerView for displaying post list data
+                        PostListRecyclerView(postList.value)
+                    }
+                }
             }
         }
     )

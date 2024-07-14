@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import javax.inject.Inject
-
 
 @HiltViewModel
 class UserLoginViewModel @Inject constructor(
@@ -25,29 +25,46 @@ class UserLoginViewModel @Inject constructor(
     val userListStateFlow = _userListStateFlow.asStateFlow()
 
     init {
+        fetchUserList()
+    }
+
+    private fun fetchUserList() {
         viewModelScope.launch {
-            delay(2000)
-            when (val result = getUserListUseCase(Unit)){
+            _userListStateFlow.update { it.copy(isLoading = true) }
 
-                is Result.Error -> {
-                    _userListStateFlow.update {
-                        it.copy(error = it.error)
+            try {
+                when (val result = getUserListUseCase(Unit)) {
+                    is Result.Error -> {
+                        _userListStateFlow.update {
+                            it.copy(error = result.exception.message ?: "Unknown error", isLoading = false)
+                        }
+                    }
+                    is Result.Loading -> {
+                        _userListStateFlow.update { it.copy(isLoading = true) }
+                    }
+                    is Result.Success -> {
+                        val uiModels = result.data.map { userListUIMapper.map(it) }
+                        _userListStateFlow.update {
+                            it.copy(
+                                userListData = uiModels,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
-                is Result.Loading -> {
-                    _userListStateFlow.update {
-                        it.copy(isLoading = true)
-                    }
+            } catch (e: UnknownHostException) {
+                _userListStateFlow.update {
+                    it.copy(
+                        error = "Network error: Unable to resolve host. Please check your internet connection.",
+                        isLoading = false
+                    )
                 }
-                is Result.Success -> {
-                    val uiModels = result.data.map { userListUIMapper.map(it) }
-
-                    _userListStateFlow.update {
-                        it.copy(
-                            userListData = uiModels,
-                            isLoading = false
-                        )
-                    }
+            } catch (e: Exception) {
+                _userListStateFlow.update {
+                    it.copy(
+                        error = e.message ?: "An unexpected error occurred",
+                        isLoading = false
+                    )
                 }
             }
         }
@@ -60,13 +77,10 @@ class UserLoginViewModel @Inject constructor(
         val userDetail: UserListUIData? = null,
     )
 
-
-
     fun getUserDetail(userName: String) {
-
         val filteredValue = userListStateFlow.value.userListData.findLast { it.userName.equals(userName, true) }
 
-        if(filteredValue != null){
+        if (filteredValue != null) {
             _userListStateFlow.update {
                 it.copy(userDetail = filteredValue)
             }
@@ -82,5 +96,4 @@ class UserLoginViewModel @Inject constructor(
             it.copy(error = "")
         }
     }
-
 }

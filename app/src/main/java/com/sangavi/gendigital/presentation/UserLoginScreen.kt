@@ -2,6 +2,13 @@ package com.sangavi.gendigital.presentation
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,12 +38,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -68,9 +77,50 @@ fun UserLoginScreen(
                 onLoginClicked(it) }, modifier
         )
 
-        if (userListState!!.isLoading) {
+        // animation
+        val progressAnimate by animateFloatAsState(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 300,//animation duration
+                delayMillis = 50,//delay before animation start
+                easing = LinearOutSlowInEasing
+            ))
+
+
+        userListState?.let {
+            if (it.isLoading) {
+                Log.e("User State", "Loading")
+                val infiniteTransition = rememberInfiniteTransition(label = "")
+                val progressAnimate by infiniteTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 1000, easing = LinearEasing)
+                    ), label = ""
+                )
+                CircularProgressIndicator(
+                    progress = progressAnimate,
+                    modifier = Modifier.align(Alignment.Center),
+                    strokeCap = StrokeCap.Round,
+                    color = Color.Gray
+                )
+            } else if (it.error.isNotEmpty()) {
+                Log.e("User State", "Error")
+                showErrorDialog(
+                    errorMessage = it.error,
+                    onDismiss = { onDismissErrorDialog() },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(Color.White)
+                        .padding(16.dp)
+                )
+            }
+        }
+
+        /*if (userListState!!.isLoading) {
             Log.e("User State", "Loading")
             CircularProgressIndicator(
+                progress = 0.89f,
                 modifier = Modifier.align(Alignment.Center),
                 color = Color.Blue
             )
@@ -83,7 +133,7 @@ fun UserLoginScreen(
                     .background(Color.White)
                     .padding(16.dp)
             )
-        }
+        }*/
     }
 
 }
