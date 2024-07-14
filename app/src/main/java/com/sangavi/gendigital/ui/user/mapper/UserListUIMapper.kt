@@ -13,12 +13,12 @@ class UserListUIMapper @Inject constructor() {
             name = listData.name,
             userName = listData.username,
             email = listData.email,
-            address = listData.address.suite +",\n " + listData.address.street +",\n " + listData.address.city +" - " + listData.address.zipcode,
+            address = listData.address.suite +",\n" + listData.address.street +",\n" + listData.address.city +" - " + listData.address.zipcode,
             lat = listData.address.geo.lat,
             lng = listData.address.geo.lng,
             phone = listData.phone,
             website = listData.website,
-            companyName = listData.company.name
+            companyDetail = listData.company.name +",\n" + listData.company.catchPhrase +",\n" + listData.company.bs
         )
 
         Log.e("UI Mapper" , " Map ${uiModel.userName}")

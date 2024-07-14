@@ -10,5 +10,5 @@ data class UserListUIData (
     val lng: String,
     val phone: String,
     val website: String,
-    val companyName: String
+    val companyDetail: String
 )

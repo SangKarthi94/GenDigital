@@ -41,32 +41,40 @@ class MainActivity : ComponentActivity() {
 
                     val state by viewModel.userListStateFlow.collectAsState()
 
-                    /*val intent = Intent(this, PostActivity::class.java)
-                    startActivity(intent)*/
+                    val userDetail = SharedPrefManager.getUserListUIData(this)
+
+                    if (userDetail != null) {
+                        navigateToPostActivity()
+                    } else {
+                        UserLoginScreen(
+                            userListState = state,
+                            onLoginClicked = viewModel::getUserDetail,
+                            onDismissErrorDialog = viewModel::dismissErrorDialog,
+                            Modifier
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(Color.White)
+                                .padding(top = 0.dp, start = 40.dp, bottom = 0.dp, end = 40.dp)
+                                .padding(it)
+                        )
+                    }
 
                     if (state.userDetail != null) {
                         // Save the data
                         SharedPrefManager.saveUserListUIData(this, state.userDetail!!)
                         // Navigate to another activity if User found
-                        val intent = Intent(this, PostActivity::class.java)
-                        startActivity(intent)
+                        navigateToPostActivity()
                     }
-
-                    UserLoginScreen(
-                        userListState = state,
-                        onLoginClicked = viewModel::getUserDetail,
-                        onDismissErrorDialog = viewModel::dismissErrorDialog,
-                        Modifier
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(Color.White)
-                            .padding(top = 0.dp, start = 40.dp, bottom = 0.dp, end = 40.dp)
-                            .padding(it)
-                    )
 
                 }
             }
         }
+    }
+
+    private fun navigateToPostActivity() {
+        val intent = Intent(this, PostActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
 

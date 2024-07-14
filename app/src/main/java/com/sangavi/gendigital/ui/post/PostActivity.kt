@@ -22,7 +22,6 @@ class PostActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         val userDetail = SharedPrefManager.getUserListUIData(this)
-        Log.e("Stored Data", "Name ${userDetail!!.name}")
 
         findViewById<ComposeView>(R.id.compose_view).setContent {
             GenDigitalTheme {
