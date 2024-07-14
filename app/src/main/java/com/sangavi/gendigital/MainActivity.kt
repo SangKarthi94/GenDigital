@@ -41,16 +41,16 @@ class MainActivity : ComponentActivity() {
 
                     val state by viewModel.userListStateFlow.collectAsState()
 
-                    val intent = Intent(this, PostActivity::class.java)
-                    startActivity(intent)
+                    /*val intent = Intent(this, PostActivity::class.java)
+                    startActivity(intent)*/
 
-                    /*if (state.userDetail != null) {
+                    if (state.userDetail != null) {
                         // Save the data
                         SharedPrefManager.saveUserListUIData(this, state.userDetail!!)
                         // Navigate to another activity if User found
                         val intent = Intent(this, PostActivity::class.java)
                         startActivity(intent)
-                    }*/
+                    }
 
                     UserLoginScreen(
                         userListState = state,

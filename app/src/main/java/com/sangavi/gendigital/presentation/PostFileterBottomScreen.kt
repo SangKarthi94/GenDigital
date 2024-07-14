@@ -1,3 +1,5 @@
+package com.sangavi.gendigital.presentation
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,24 +15,29 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sangavi.gendigital.ui.post.viewmodel.FilterOption
-import com.sangavi.gendigital.ui.post.viewmodel.PostViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterBottomSheet(
-    viewModel: PostViewModel,
+    initialFilter: FilterOption,
+    onFilterSelected: (FilterOption) -> Unit,
     onDismiss: () -> Unit,
     modalBottomSheetState: SheetState
 ) {
-    val filterOption = viewModel.selectedFilter.collectAsState()
+    val selectedOption = remember { mutableStateOf(initialFilter) }
+
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            onFilterSelected(selectedOption.value)
+            onDismiss()
+        },
         sheetState = modalBottomSheetState,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
@@ -46,30 +53,36 @@ fun FilterBottomSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { viewModel.setFilter(FilterOption.ALL_POSTS) }
+                    .clickable { selectedOption.value = FilterOption.ALL_POSTS }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = filterOption.value == FilterOption.ALL_POSTS,
-                    onClick = { viewModel.setFilter(FilterOption.ALL_POSTS) }
+                    selected = selectedOption.value == FilterOption.ALL_POSTS,
+                    onClick = { selectedOption.value = FilterOption.ALL_POSTS }
                 )
                 Text(text = "All Posts", modifier = Modifier.padding(start = 8.dp))
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { viewModel.setFilter(FilterOption.MY_POSTS) }
+                    .clickable { selectedOption.value = FilterOption.MY_POSTS }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = filterOption.value == FilterOption.MY_POSTS,
-                    onClick = { viewModel.setFilter(FilterOption.MY_POSTS) }
+                    selected = selectedOption.value == FilterOption.MY_POSTS,
+                    onClick = { selectedOption.value = FilterOption.MY_POSTS }
                 )
                 Text(text = "My Posts", modifier = Modifier.padding(start = 8.dp))
             }
-            Button(onClick = onDismiss, modifier = Modifier.padding(top = 16.dp)) {
+            Button(
+                onClick = {
+                    onFilterSelected(selectedOption.value)
+                    onDismiss()
+                },
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
                 Text(text = "Done")
             }
         }

@@ -10,7 +10,6 @@ import com.sangavi.gendigital.ui.post.model.PostListData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +22,7 @@ class PostViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _postListStateFlow = MutableStateFlow(PostViewState())
-    val postListStateFlow = _postListStateFlow.asStateFlow()
+    val postListStateFlow: StateFlow<PostViewState> = _postListStateFlow
 
     private val _selectedFilter = MutableStateFlow(FilterOption.ALL_POSTS)
     val selectedFilter: StateFlow<FilterOption> = _selectedFilter
@@ -33,20 +32,22 @@ class PostViewModel @Inject constructor(
         getAllPostList()
     }
 
-    private fun getAllPostList(){
+    private fun getAllPostList() {
         viewModelScope.launch {
 
-            when (val result = getListUseCase(Unit)){
+            when (val result = getListUseCase(Unit)) {
                 is Result.Error -> {
                     _postListStateFlow.update {
                         it.copy(error = it.error)
                     }
                 }
+
                 is Result.Loading -> {
                     _postListStateFlow.update {
                         it.copy(isLoading = true)
                     }
                 }
+
                 is Result.Success -> {
 
                     Log.e("All post", "${result.data.size}")
@@ -61,20 +62,22 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun getUserPostList(userId: Int){
+    fun getUserPostList(userId: Int) {
         viewModelScope.launch {
 
-            when (val result = getPostListUseCase(userId)){
+            when (val result = getPostListUseCase(userId)) {
                 is Result.Error -> {
                     _postListStateFlow.update {
                         it.copy(error = it.error)
                     }
                 }
+
                 is Result.Loading -> {
                     _postListStateFlow.update {
                         it.copy(isLoading = true)
                     }
                 }
+
                 is Result.Success -> {
 
                     Log.e("User post", "${result.data.size}")
@@ -98,6 +101,10 @@ class PostViewModel @Inject constructor(
 
     fun setFilter(filter: FilterOption) {
         _selectedFilter.value = filter
+    }
+
+    fun getFilter(): FilterOption {
+        return _selectedFilter.value
     }
 
     fun dismissErrorDialog() {

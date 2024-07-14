@@ -1,24 +1,26 @@
 package com.sangavi.gendigital.presentation
 
-import FilterBottomSheet
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.sangavi.gendigital.ui.post.model.PostListData
 import com.sangavi.gendigital.ui.post.viewmodel.FilterOption
 import com.sangavi.gendigital.ui.post.viewmodel.PostViewModel
 import com.sangavi.gendigital.ui.user.model.UserListUIData
@@ -35,25 +37,60 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun postListUIScreen(
+fun PostListUIScreen(
     userListUIData: UserListUIData,
     onProfileClick: () -> Unit,
     viewModel: PostViewModel
 ) {
-    val context = LocalContext.current
+//    val context = LocalContext.current
     val showBottomSheet = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     val modalBottomSheetState = rememberModalBottomSheetState(false)
 
+    // Collect the state flow from the view model
+    val postListState by viewModel.postListStateFlow.collectAsState()
+
+    // Local state to hold the filtered list of posts
+    val postList = remember { mutableStateOf<List<PostListData>>(emptyList()) }
+    val filter by viewModel.selectedFilter.collectAsState()  // Collect the selected filter state
+
+    // Update the local list based on filter and postListState changes
+    LaunchedEffect(postListState) {
+        postList.value = when (viewModel.getFilter()) {
+            FilterOption.ALL_POSTS -> postListState.postListData
+            FilterOption.MY_POSTS -> postListState.userPostListData
+        }
+    }
+
+    // Handle filter changes
+    LaunchedEffect(viewModel.getFilter()) {
+        postList.value = when (viewModel.getFilter()) {
+            FilterOption.ALL_POSTS -> postListState.postListData
+            FilterOption.MY_POSTS -> postListState.userPostListData
+        }
+    }
+
+
+    //Bottom sheet integration
     if (showBottomSheet.value) {
         FilterBottomSheet(
-            viewModel = viewModel,
+            initialFilter = viewModel.selectedFilter.collectAsState().value,
+            onFilterSelected = { selectedFilter ->
+                viewModel.setFilter(selectedFilter)
+            },
             onDismiss = {
                 coroutineScope.launch {
                     modalBottomSheetState.hide()
                 }
                 showBottomSheet.value = false
+
+                // Update postList based on the new filter
+                postList.value = when (viewModel.getFilter()) {
+                    FilterOption.ALL_POSTS -> postListState.postListData
+                    FilterOption.MY_POSTS -> postListState.userPostListData
+                }
+
             },
             modalBottomSheetState = modalBottomSheetState
         )
@@ -62,54 +99,59 @@ fun postListUIScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { /*Text("Main Screen")*/ },
+                title = { Text(text = when (filter) {
+                    FilterOption.ALL_POSTS -> "All Posts"
+                    FilterOption.MY_POSTS -> "My Posts"
+                }) },
                 actions = {
                     ProfileRow(
                         userListUIData.name,
                         onClick = {
-                            // Handle the click event, e.g., show a toast or navigate to another screen
+                            // Handle the click event for the profile image and name
                             onProfileClick()
-                            Log.e("Profile Clicked", "OnClick")
                         }
                     )
                 }
             )
         },
         content = {
-
+            //Main Content Page
             Column(modifier = Modifier.padding(it)) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = "Post List",
-                        fontSize = 30.sp
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "Filter",
                         modifier = Modifier.clickable {
                             showBottomSheet.value = true
-                        }
+                        }.padding(end = 25.dp)
                     )
                 }
-
-                // Display filtered content based on the selected filter
-                when (viewModel.selectedFilter.collectAsState().value) {
-                    FilterOption.ALL_POSTS -> {
-                        // Display all posts
-                        Toast.makeText(context,"All Post", Toast.LENGTH_SHORT).show()
-                    }
-
-                    FilterOption.MY_POSTS -> {
-                        // Display user's posts
-                        Toast.makeText(context,"My Post", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                // RecyclerView for displaying post list data
+                PostListRecyclerView(postList.value)
             }
         }
     )
 
+}
+
+@Composable
+fun PostListRecyclerView(postList: List<PostListData>) {
+    LazyColumn {
+        itemsIndexed(postList) { index, news ->
+            PostListItem(index, news)
+        }
+    }
+}
+
+@Composable
+fun PostListItem(index: Int, post: PostListData) {
+    Log.e("Index", "$index")
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = post.title, style = MaterialTheme.typography.titleLarge)
+        Text(text = post.body, style = MaterialTheme.typography.bodyMedium)
+    }
 }
 
 //To make Profile Image onClick
