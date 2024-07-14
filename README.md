@@ -1,7 +1,7 @@
-Language : Kotlin
-Architecture: MVVM
-DI : Hilt Dependency Injection
-UI Design: Jetpack Compose and Constraint layout
+**Language** : Kotlin
+**Architecture**: MVVM
+**DI** : Hilt Dependency Injection
+**UI Design**: Jetpack Compose and Constraint layout
 Here used Both Activity and Fragment 
 
 **Here we have 3 pages**
