@@ -43,6 +43,10 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
             activity?.finish()
         }
+
+        binding.backImg.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun pinLocationMap(latitude: String?, longitude: String?) {
