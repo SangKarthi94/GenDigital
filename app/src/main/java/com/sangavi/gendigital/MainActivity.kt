@@ -27,7 +27,7 @@ import com.sangavi.gendigital.ui.theme.GenDigitalTheme
 import com.sangavi.gendigital.ui.user.viewmodel.UserLoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
+@AndroidEntryPoint //Bret -> login, https://jsonplaceholder.typicode.com/users
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
