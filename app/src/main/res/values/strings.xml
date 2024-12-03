@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GenDigital</string>
+    <string name="app_name">Mahindra</string>
     <string name="web_link"><u>hildegard.org</u></string>
     <string name="locate_me"><u>Locate Me</u></string>
     <string name="profile">Profile</string>
@@ -11,4 +11,12 @@
     <string name="email">Email :</string>
     <string name="website">Website :</string>
     <string name="sincere_april_biz">sincere@april.biz</string>
+    <string name="title_weekly">Weekly</string>
+    <string name="title_monthly">Monthly</string>
+    <string name="discounted_total">Discounted Total</string>
+    <string name="total_products">Total Products</string>
+    <string name="total_expenses">Total\nExpenses</string>
+    <string name="energy_consumed">Energy\nConsumed</string>
+    <string name="expense_management">Expense Management</string>
+    <string name="expense_title">Expense Over Energy Conception</string>
 </resources>

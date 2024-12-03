@@ -13,19 +13,22 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.GenDigital"
+        android:theme="@style/Theme.Mahindra"
         tools:targetApi="31">
         <activity
-            android:name=".ui.post.PostActivity"
-            android:theme="@style/Theme.GenDigitalTheme"
-            android:screenOrientation="portrait"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.post.PostActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MahindraTheme"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+        <activity
+            android:name=".ui.dashboard.DashboardActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.GenDigital">
+            android:theme="@style/Theme.Mahindra">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

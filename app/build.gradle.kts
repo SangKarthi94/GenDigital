@@ -8,17 +8,17 @@ plugins {
 
 //apollo {
 //    service("service") {
-//        packageName.set("com.sangavi.gendigital")
+//        packageName.set("com.infiquity.mahindra")
 //    }
 //}
 
 android {
-    namespace = "com.sangavi.gendigital"
+    namespace = "com.infiquity.mahindra"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.sangavi.gendigital"
-        minSdk = 24
+        applicationId = "com.infiquity.mahindra"
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.mpandroidchart)
 
     implementation(libs.androidx.hilt)
     implementation(libs.hilt.android)

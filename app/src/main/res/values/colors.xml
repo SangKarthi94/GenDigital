@@ -10,4 +10,9 @@
     <color name="light_grey">#FAFAFA</color>
     <color name="theme_grey">#62000000</color>
     <color name="view_color">#1f212121</color>
+
+    <color name="bg_blue">#1C4792</color>
+    <color name="chart_blue">#497FDC</color>
+    <color name="expense_summary_bg_white">#497FDC1A</color>
+    <color name="bg_unselected_tab">#0000001A</color>
 </resources>
