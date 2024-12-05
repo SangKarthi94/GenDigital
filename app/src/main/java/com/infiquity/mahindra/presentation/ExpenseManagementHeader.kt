@@ -2,13 +2,13 @@ package com.infiquity.mahindra.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -56,7 +54,7 @@ fun ExpenseManagementHeader(
             contentDescription = "Dashboard Background",
             modifier = Modifier.fillMaxWidth()
                 .wrapContentSize()
-                .background(color = Color(0xFF497FDC).copy(alpha = 0.8f)),
+                .background(color = Color(0x1C4792).copy(alpha = 0.8f)),
             contentScale = ContentScale.FillBounds // Ensures the image scales properly
         )
 
@@ -102,8 +100,9 @@ fun ExpenseManagementHeader(
                 Row(
                     modifier = Modifier
                         .wrapContentWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0x1A000000)), // Transparent black background with rounded corners
+                        .clip(RoundedCornerShape(16.dp)) // Rounded corners
+                        .background(Color(0x1A000000)) // Transparent black background
+                        .border(1.dp, Color.White, RoundedCornerShape(16.dp)), // White border with rounded corners
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {

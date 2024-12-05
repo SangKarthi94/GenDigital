@@ -42,9 +42,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infiquity.mahindra.R
+import com.infiquity.mahindra.ui.dashboard.model.Cart
 import com.infiquity.mahindra.ui.dashboard.viewmodel.CartFilterOption
 import com.infiquity.mahindra.ui.dashboard.viewmodel.DashboardViewModel
 import com.infiquity.mahindra.ui.theme.Pink80
@@ -164,7 +166,86 @@ fun ExpenseContent(viewState: DashboardViewModel.CartViewState) {
     }
 }
 
+@Preview(showBackground = true, name = "Expense Management Screen Preview")
+@Composable
+fun PreviewExpenseManagementScreen() {
+    // Mock ViewModel state
+    val mockCartListState = DashboardViewModel.CartViewState(
+        isLoading = false,
+        error = "",
+        totalExpenses = 1200.50,
+        energyConsumed = 65,
+        filteredCartListData = listOf(
+            Cart(userId = 1, discountedTotal = 300.0, totalProducts = 5),
+            Cart(userId = 2, discountedTotal = 400.0, totalProducts = 6),
+            Cart(userId = 3, discountedTotal = 500.0, totalProducts = 7)
+        )
+    )
 
+    val mockSelectedFilter = CartFilterOption.WEEKLY
+
+    ExpenseManagementScreenPreviewContent(
+        viewState = mockCartListState,
+        selectedFilter = mockSelectedFilter,
+        onTabSelected = {},
+        onDismissErrorDialog = {}
+    )
+}
+
+@Composable
+fun ExpenseManagementScreenPreviewContent(
+    viewState: DashboardViewModel.CartViewState,
+    selectedFilter: CartFilterOption,
+    onTabSelected: (CartFilterOption) -> Unit,
+    onDismissErrorDialog: () -> Unit
+) {
+    val dateRange = when (selectedFilter) {
+        CartFilterOption.WEEKLY -> "15 Feb 2024 - 21 Feb 2024"
+        CartFilterOption.MONTHLY -> "01 Feb 2024 - 28 Feb 2024"
+    }
+
+    Scaffold(
+        topBar = {
+            ExpenseManagementHeader(
+                selectedTab = selectedFilter,
+                dateRange = dateRange,
+                onTabSelected = onTabSelected
+            )
+        },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                if (viewState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        strokeCap = StrokeCap.Round,
+                        color = Color.Gray
+                    )
+                } else if (viewState.error.isNotEmpty()) {
+                    showErrorDialog(
+                        errorMessage = viewState.error,
+                        onDismiss = onDismissErrorDialog,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(Color.White)
+                            .padding(16.dp)
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()) // Makes it scrollable
+                    ) {
+                        ExpenseContent(viewState)
+                    }
+                }
+            }
+        }
+    )
+}
 
 
 

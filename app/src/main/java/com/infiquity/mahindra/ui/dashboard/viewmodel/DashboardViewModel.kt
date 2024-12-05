@@ -162,7 +162,6 @@ class DashboardViewModel @Inject constructor(
         val today = calendar.time
         val todayFormatted = dateFormat.format(today)
 
-        // Move the calendar back by 7 days
         if (is7Days)
             calendar.add(Calendar.DAY_OF_YEAR, -6) // Include today, so 7 days total
         else
@@ -200,7 +199,7 @@ class DashboardViewModel @Inject constructor(
 
 fun assignRandomDatesToCarts(cartList: List<Cart>): List<Cart> {
     return cartList.map { cart ->
-        cart.copy(date = getRandomDateWithinLastTwoMonths()) // Assuming `date` is a LocalDate field
+        cart.copy(date = getRandomDateWithinLastTwoMonths())
     }
 }
 
